@@ -6,8 +6,11 @@ from urllib.parse import quote
 import base64
 from io import BytesIO
 from PIL import Image
+import os
 from openai import OpenAI
 
+# OpenAI API-Key wird aus der Umgebungsvariable geladen
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Setze den Key mit: export OPENAI_API_KEY=sk-...
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # 1. Metadaten der ersten fünf Bücher aus der Collection abrufen
@@ -38,16 +41,17 @@ for p in prompts:
     print(f"Buch: {p['title']}")
     print(f"Prompt: {p['prompt']}\n")
 
-OPENAI_API_KEY = "REMOVED_OPENAI_KEY"  # <-- Hier deinen OpenAI API-Key eintragen
 
 # Funktion zum Bildgenerieren via OpenAI DALL·E API (dall-e-2)
 def generate_image(prompt, filename):
     try:
         print(f"Sende Prompt an OpenAI DALL·E: {prompt}")
-        response = client.images.generate(prompt=prompt,
-        n=1,
-        size="1024x1024",  # oder "512x512" für günstiger
-        model="dall-e-2"   # günstigstes Modell)
+        response = client.images.generate(
+            prompt=prompt,
+            n=1,
+            size="1024x1024",  # oder "512x512" für günstiger
+            model="dall-e-2"   # günstigstes Modell
+        )
         image_url = response.data[0].url
         img_data = requests.get(image_url).content
         with open(filename, 'wb') as handler:
